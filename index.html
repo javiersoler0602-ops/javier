@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Un Viaje Mágico por las Estrellas Hasta Nuestro Corazón 🤍✨</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        dancing: ['Dancing Script', 'cursive'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            100: '#fff9e6',
+                            300: '#ffe899',
+                            400: '#ffd700',
+                            500: '#e6b800',
+                            600: '#b38f00',
+                        },
+                        rose: {
+                            400: '#ff80bf',
+                            500: '#ff4da6',
+                            600: '#e60073',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #020108;
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(12, 6, 24, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2), inset 0 0 25px rgba(255, 182, 193, 0.15);
+        }
+
+        .gold-glow-text {
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 105, 180, 0.5);
+        }
+
+        .gold-border-glow {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.25);
+        }
+
+        /* Typewriter Cursor */
+        .cursor-blink {
+            display: inline-block;
+            width: 3px;
+            height: 1.1em;
+            background-color: #ffd700;
+            margin-left: 3px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="relative w-full h-full select-none overflow-hidden bg-black text-white">
+
+    <!-- 3D WebGL Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay Layer -->
+    <div id="ui-layer" class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-6 md:p-10">
+        
+        <!-- Header -->
+        <header class="text-center pt-2 transition-all duration-1000 opacity-100" id="header-ui">
+            <h2 class="font-cinzel text-xs md:text-sm tracking-[0.5em] text-gold-300 uppercase mb-1">Un Viaje Mágico por las Estrellas</h2>
+            <h1 class="font-dancing text-4xl md:text-6xl text-white gold-glow-text font-bold">Para El Amor De Mi Vida</h1>
+            <p class="text-xs md:text-sm text-pink-200/90 font-light tracking-widest mt-2" id="stage-subtitle">Toca el Corazón de Cristal para comenzar la magia ✨</p>
+        </header>
+
+        <!-- Dynamic Action Controls -->
+        <div class="flex justify-center pb-6 pointer-events-auto" id="controls-ui">
+            <button id="main-btn" class="glass-panel px-8 py-4 rounded-full text-gold-300 font-cinzel text-xs md:text-sm tracking-widest uppercase flex items-center gap-3 transition-all duration-500 hover:scale-105 hover:bg-gold-400/20 active:scale-95 cursor-pointer border border-gold-400/60 gold-border-glow">
+                <span id="btn-text">Desbloquear Nuestra Sorpresa 🤍</span>
+                <span id="btn-icon" class="text-xl">✨</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Romantic Letter Modal -->
+    <div id="letter-modal" class="absolute inset-0 z-20 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-1000 transform scale-90">
+        <div class="glass-panel w-full max-w-2xl max-h-[85vh] rounded-3xl p-6 md:p-10 flex flex-col items-center text-center relative overflow-y-auto border-2 border-gold-400/50">
+            
+            <div class="text-gold-400 font-cinzel text-xs tracking-[0.4em] uppercase mb-2">Carta Estelar Para Ti</div>
+            <h2 class="font-dancing text-3xl md:text-5xl text-pink-200 gold-glow-text mb-6">Te Amo Con Todo Mi Ser 🤍</h2>
+            
+            <div class="font-dancing text-2xl md:text-3xl text-white leading-relaxed mb-8 px-2 md:px-6 min-h-[150px]" id="typewriter-text">
+                <!-- Typed Content -->
+            </div>
+
+            <!-- Dynamic Verses -->
+            <div class="w-full glass-panel bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
+                <p class="font-montserrat text-xs md:text-sm text-gold-200 italic" id="quote-display">"Eres mi hoy, mi mañana y mi eternidad..."</p>
+                <button id="new-quote-btn" class="mt-3 text-xs text-pink-300 hover:text-white uppercase tracking-wider underline cursor-pointer pointer-events-auto">
+                    Generar otro verso de amor 💫
+                </button>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 pointer-events-auto">
+                <button id="close-letter-btn" class="px-6 py-3 rounded-full bg-gold-400/20 hover:bg-gold-400/40 border border-gold-400 text-gold-200 font-cinzel text-xs tracking-widest uppercase transition-all duration-300 hover:scale-105">
+                    Seguir Explorando El Universo ✨
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Control Button -->
+    <button id="audio-toggle-btn" class="absolute bottom-6 right-6 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center text-gold-300 text-lg cursor-pointer transition-all duration-300 hover:scale-110 border border-gold-400/40 pointer-events-auto" title="Música Romántica">
+        🎵
+    </button>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- DATASET ---
+        const romanticQuotes = [
+            "\"De todo el universo y entre infinitas estrellas, mi lugar favorito siempre será a tu lado.\"",
+            "\"Eres el sueño del que nunca quiero despertar y la luz que guía todos mis días.\"",
+            "\"Te amoooo muchoooo mi polola hermosa, hoy, mañana y por el resto de la eternidad. 💐🤍\"",
+            "\"Cada latido de mi corazón pronuncia tu nombre en el silencio de las galaxias.\"",
+            "\"Contigo la vida no solo es bella, es una verdadera obra de arte en las estrellas.\"",
+            "\"Si el universo es infinito, mi amor por ti supera todos sus confines.\""
+        ];
+
+        const floatingNotes = [
+            "Te Amo 🤍", "Mi Polola ✨", "Eres Mi Sol ☀️", "Para Siempre 💍", 
+            "Mi Todo 💐", "Universo De Amor 🌌", "I Infinito ♾️", "Mi Niña Hermosa 🌸",
+            "Mi Vida 💖", "Eternidad 💫", "Luz De Mis Ojos ✨", "Juntos Por Siempre 💍"
+        ];
+
+        const romanticLetterText = "Mi niña hermosa, creé este universo único para ti, porque un amor tan puro, mágico e infinito como el tuyo no cabe en un solo planeta. Eres mi sol, mi luna y todas mis estrellas. Gracias por iluminar mi vida con tu sonrisa y por ser la mejor polola del mundo entero. Te amoooo muchoooo hoy y siempre 💐🤍✨";
+
+        // --- GLOBAL APP STATE ---
+        let currentStage = 0; // 0: Crystal Heart, 1: Tulip Bouquet & Frames, 2: Open Letter
+        let isAudioPlaying = false;
+        let audioCtx, masterGain;
+        let typewriterIndex = 0;
+        let typewriterInterval = null;
+
+        // --- THREE.JS ENGINE SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020108, 0.008);
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 12);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.25;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxDistance = 30;
+        controls.minDistance = 3;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.8;
+
+        // --- LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xfff0f5, 0.8);
+        scene.add(ambientLight);
+
+        const centerPointLight = new THREE.PointLight(0xffd700, 2.5, 30);
+        centerPointLight.position.set(0, 0, 0);
+        scene.add(centerPointLight);
+
+        const pinkRimLight = new THREE.DirectionalLight(0xff4da6, 1.5);
+        pinkRimLight.position.set(5, 10, 7);
+        scene.add(pinkRimLight);
+
+        const blueRimLight = new THREE.DirectionalLight(0x4da6ff, 1.0);
+        blueRimLight.position.set(-5, -10, -7);
+        scene.add(blueRimLight);
+
+        // --- 1. COSMIC ENVIRONMENT (Stars, Nebulae, Meteors) ---
+        const starCount = 3500;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 120;
+            starPos[i + 1] = (Math.random() - 0.5) * 120;
+            starPos[i + 2] = (Math.random() - 0.5) * 120;
+
+            const colorType = Math.random();
+            if (colorType > 0.6) {
+                starColors[i] = 1.0; starColors[i + 1] = 0.84; starColors[i + 2] = 0.0;
+            } else if (colorType > 0.3) {
+                starColors[i] = 1.0; starColors[i + 1] = 0.41; starColors[i + 2] = 0.71;
+            } else {
+                starColors[i] = 1.0; starColors[i + 1] = 1.0; starColors[i + 2] = 1.0;
+            }
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        const starMat = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85
+        });
+        const starField = new THREE.Points(starGeo, starMat);
+        scene.add(starField);
+
+        // Shooting Stars System
+        const shootingStars = [];
+        const shootingStarGeo = new THREE.ConeGeometry(0.04, 2.5, 4);
+        shootingStarGeo.rotateX(Math.PI / 2);
+        const shootingStarMat = new THREE.MeshBasicMaterial({ color: 0xfff0f5, transparent: true, opacity: 0 });
+
+        for (let i = 0; i < 4; i++) {
+            const sStar = new THREE.Mesh(shootingStarGeo, shootingStarMat.clone());
+            resetShootingStar(sStar);
+            scene.add(sStar);
+            shootingStars.push(sStar);
+        }
+
+        function resetShootingStar(star) {
+            star.position.set((Math.random() - 0.5) * 60, Math.random() * 25 + 10, (Math.random() - 0.5) * 40 - 10);
+            star.velocity = new THREE.Vector3(-(Math.random() * 0.4 + 0.3), -(Math.random() * 0.2 + 0.15), (Math.random() - 0.5) * 0.1);
+            star.material.opacity = 0;
+            star.life = 0;
+            star.maxLife = Math.random() * 60 + 40;
+        }
+
+        // --- 2. STAGE 0: CRYSTAL HEART GEM ---
+        const crystalGroup = new THREE.Group();
+        scene.add(crystalGroup);
+
+        // 3D Heart Mesh Shape Construction
+        const heartShape = new THREE.Shape();
+        const x = 0, y = 0;
+        heartShape.moveTo(x + 25, y + 25);
+        heartShape.bezierCurveTo(x + 25, y + 25, x + 20, y, x, y);
+        heartShape.bezierCurveTo(x - 30, y, x - 30, y + 35, x - 30, y + 35);
+        heartShape.bezierCurveTo(x - 30, y + 55, x - 10, y + 77, x + 25, y + 95);
+        heartShape.bezierCurveTo(x + 60, y + 77, x + 80, y + 55, x + 80, y + 35);
+        heartShape.bezierCurveTo(x + 80, y + 35, x + 80, y, x + 50, y);
+        heartShape.bezierCurveTo(x + 35, y, x + 25, y + 25, x + 25, y + 25);
+
+        const extrudeSettings = {
+            depth: 16,
+            bevelEnabled: true,
+            bevelSegments: 5,
+            steps: 2,
+            bevelSize: 6,
+            bevelThickness: 6
+        };
+
+        const heartGeo = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        heartGeo.center();
+        heartGeo.scale(0.025, 0.025, 0.025);
+
+        const heartMat = new THREE.MeshPhysicalMaterial({
+            color: 0xff3385,
+            emissive: 0x660033,
+            roughness: 0.1,
+            metalness: 0.1,
+            transmission: 0.9,
+            thickness: 1.2,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+            ior: 1.5,
+            reflectivity: 0.9
+        });
+
+        const heartMesh = new THREE.Mesh(heartGeo, heartMat);
+        heartMesh.rotation.z = Math.PI;
+        crystalGroup.add(heartMesh);
+
+        // Orbiting Golden Rings
+        const ringGroup = new THREE.Group();
+        const ringGeo = new THREE.TorusGeometry(2.2, 0.02, 16, 100);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2, emissive: 0xaa8800 });
+        
+        const ring1 = new THREE.Mesh(ringGeo, ringMat);
+        ring1.rotation.x = Math.PI / 3;
+        ringGroup.add(ring1);
+
+        const ring2 = new THREE.Mesh(ringGeo, ringMat);
+        ring2.rotation.y = Math.PI / 3;
+        ring2.rotation.x = -Math.PI / 4;
+        ringGroup.add(ring2);
+
+        crystalGroup.add(ringGroup);
+
+        // Floating Gold Sparkles around Heart
+        const heartSparklesCount = 200;
+        const heartSparkleGeo = new THREE.BufferGeometry();
+        const heartSparklePos = new Float32Array(heartSparklesCount * 3);
+        for(let i=0; i<heartSparklesCount*3; i+=3) {
+            heartSparklePos[i] = (Math.random() - 0.5) * 5;
+            heartSparklePos[i+1] = (Math.random() - 0.5) * 5;
+            heartSparklePos[i+2] = (Math.random() - 0.5) * 5;
+        }
+        heartSparkleGeo.setAttribute('position', new THREE.BufferAttribute(heartSparklePos, 3));
+        const heartSparkleMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.08, transparent: true, opacity: 0.8 });
+        const heartSparkles = new THREE.Points(heartSparkleGeo, heartSparkleMat);
+        crystalGroup.add(heartSparkles);
+
+        // --- 3. STAGE 1: BLOOMING TULIP BOUQUET & PHOTO FRAMES ---
+        const bouquetGroup = new THREE.Group();
+        bouquetGroup.position.set(0, -1.5, 0);
+        bouquetGroup.scale.set(0.001, 0.001, 0.001); // Hidden initially
+        scene.add(bouquetGroup);
+
+        // Function to create procedural 3D Tulip
+        function createTulipMesh(petalColorHex) {
+            const tulip = new THREE.Group();
+
+            // Stem
+            const stemCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0.05, 1.2, 0.02),
+                new THREE.Vector3(0, 2.2, 0)
+            ]);
+            const stemGeo = new THREE.TubeGeometry(stemCurve, 20, 0.04, 8, false);
+            const stemMat = new THREE.MeshStandardMaterial({ color: 0x2d8a4e, roughness: 0.6 });
+            const stem = new THREE.Mesh(stemGeo, stemMat);
+            tulip.add(stem);
+
+            // Petals Geometry
+            const petalShape = new THREE.Shape();
+            petalShape.moveTo(0, 0);
+            petalShape.quadraticCurveTo(0.3, 0.5, 0.25, 1.0);
+            petalShape.quadraticCurveTo(0.0, 1.3, -0.25, 1.0);
+            petalShape.quadraticCurveTo(-0.3, 0.5, 0, 0);
+
+            const petalGeo = new THREE.ShapeGeometry(petalShape);
+            const petalMat = new THREE.MeshStandardMaterial({
+                color: petalColorHex,
+                roughness: 0.4,
+                metalness: 0.1,
+                side: THREE.DoubleSide
+            });
+
+            // 6 Petals forming a bulb
+            const petalsGroup = new THREE.Group();
+            petalsGroup.position.set(0, 2.2, 0);
+
+            for (let i = 0; i < 6; i++) {
+                const petal = new THREE.Mesh(petalGeo, petalMat);
+                const angle = (i / 6) * Math.PI * 2;
+                petal.rotation.y = angle;
+                petal.rotation.x = 0.25;
+                petal.rotation.z = -0.1;
+                petal.scale.set(0.8, 0.9, 0.8);
+                petalsGroup.add(petal);
+            }
+            tulip.add(petalsGroup);
+            return tulip;
+        }
+
+        // Build Bouquet with 9 Tulips (White & Pink)
+        const tulipColors = [0xffffff, 0xff80bf, 0xffffff, 0xff4da6, 0xffffff, 0xff99cc, 0xffffff, 0xff3399, 0xffe6f2];
+        for (let i = 0; i < 9; i++) {
+            const tulip = createTulipMesh(tulipColors[i]);
+            const angle = (i / 9) * Math.PI * 2;
+            const radius = 0.4;
+            tulip.position.x = Math.cos(angle) * radius;
+            tulip.position.z = Math.sin(angle) * radius;
+            tulip.rotation.z = (Math.random() - 0.5) * 0.2;
+            tulip.rotation.x = (Math.random() - 0.5) * 0.2;
+            bouquetGroup.add(tulip);
+        }
+
+        // Bouquet Silk Wrapping & Glowing Ribbon
+        const wrapGeo = new THREE.ConeGeometry(1.2, 2.2, 16, 1, true);
+        const wrapMat = new THREE.MeshStandardMaterial({
+            color: 0xfff0f5,
+            roughness: 0.5,
+            transparent: true,
+            opacity: 0.85,
+            side: THREE.DoubleSide
+        });
+        const wrap = new THREE.Mesh(wrapGeo, wrapMat);
+        wrap.position.set(0, 0.9, 0);
+        wrap.rotation.x = Math.PI;
+        bouquetGroup.add(wrap);
+
+        // Ribbon Bow
+        const ribbonGeo = new THREE.TorusGeometry(0.35, 0.04, 16, 50);
+        const ribbonMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
+        const ribbon = new THREE.Mesh(ribbonGeo, ribbonMat);
+        ribbon.position.set(0, 0.8, 0.35);
+        ribbon.rotation.x = Math.PI / 2;
+        bouquetGroup.add(ribbon);
+
+        // Floating Glass Photo Frames around Bouquet
+        const framesGroup = new THREE.Group();
+        scene.add(framesGroup);
+
+        function createPhotoFrame(imageText, subText) {
+            const frameContainer = new THREE.Group();
+
+            // Outer Gold Frame
+            const outerGeo = new THREE.BoxGeometry(2.0, 2.5, 0.08);
+            const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2 });
+            const outerFrame = new THREE.Mesh(outerGeo, goldMat);
+            frameContainer.add(outerFrame);
+
+            // Inner Canvas with Canvas Texture
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 640;
+            const ctx = canvas.getContext('2d');
+            
+            // Gradient Background for Photo
+            const grad = ctx.createLinearGradient(0, 0, 512, 640);
+            grad.addColorStop(0, '#1a0033');
+            grad.addColorStop(0.5, '#4a0033');
+            grad.addColorStop(1, '#000000');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 640);
+
+            // Artistic Card Content
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, 472, 600);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px "Cinzel", serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(imageText, 256, 300);
+
+            ctx.fillStyle = '#ffb6c1';
+            ctx.font = '28px "Dancing Script", cursive';
+            ctx.fillText(subText, 256, 380);
+
+            ctx.fillStyle = '#ffd700';
+            ctx.font = '40px sans-serif';
+            ctx.fillText('🤍✨', 256, 460);
+
+            const photoTexture = new THREE.CanvasTexture(canvas);
+            const photoGeo = new THREE.PlaneGeometry(1.8, 2.3);
+            const photoMat = new THREE.MeshBasicMaterial({ map: photoTexture });
+            const photoMesh = new THREE.Mesh(photoGeo, photoMat);
+            photoMesh.position.z = 0.05;
+            frameContainer.add(photoMesh);
+
+            return frameContainer;
+        }
+
+        const frameData = [
+            { text: "Nuestros Recuerdos", sub: "Momentos Inolvidables", x: -3.8, y: 0.5, z: 0, rotY: 0.35 },
+            { text: "Mi Lugar Favorito", sub: "Siempre Contigo", x: 3.8, y: 0.5, z: 0, rotY: -0.35 },
+            { text: "Amor Eterno", sub: "Hasta Las Estrellas", x: 0, y: 2.8, z: -2, rotY: 0 }
+        ];
+
+        const frameMeshes = [];
+        frameData.forEach(data => {
+            const frame = createPhotoFrame(data.text, data.sub);
+            frame.position.set(data.x, data.y, data.z);
+            frame.rotation.y = data.rotY;
+            frame.scale.set(0.001, 0.001, 0.001); // Hidden initially
+            framesGroup.add(frame);
+            frameMeshes.push(frame);
+        });
+
+        // Floating 3D Love Notes (Sprite Constellation)
+        const notesGroup = new THREE.Group();
+        scene.add(notesGroup);
+
+        function createTextSprite(message) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(10, 5, 20, 0.7)';
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+            ctx.lineWidth = 2;
+            
+            // Rounded Box
+            ctx.beginPath();
+            ctx.roundRect(5, 5, 246, 54, 15);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px "Montserrat", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(message, 128, 32);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.85 });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(1.5, 0.38, 1);
+            return sprite;
+        }
+
+        floatingNotes.forEach((noteText, idx) => {
+            const sprite = createTextSprite(noteText);
+            const angle = (idx / floatingNotes.length) * Math.PI * 2;
+            const radius = 5.0 + Math.random() * 2.0;
+            sprite.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 4.0, Math.sin(angle) * radius);
+            sprite.scale.set(0.001, 0.001, 0.001);
+            notesGroup.add(sprite);
+        });
+
+        // --- INTERACTION & RAYCASTING ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (e) => {
+            // Ignore UI clicks
+            if (e.target.closest('#ui-layer') || e.target.closest('#letter-modal') || e.target.closest('#audio-toggle-btn')) return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            if (currentStage === 0) {
+                const intersects = raycaster.intersectObject(heartMesh);
+                if (intersects.length > 0) {
+                    triggerStageTransition();
+                }
+            } else if (currentStage === 1) {
+                // Check frames click
+                const frameIntersects = raycaster.intersectObjects(frameMeshes, true);
+                if (frameIntersects.length > 0) {
+                    const hitFrame = frameIntersects[0].object.ancestor || frameIntersects[0].object.parent;
+                    playChimeSound(600);
+                    gsap.to(hitFrame.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.3, yoyo: true, repeat: 1 });
+                }
+            }
+        });
+
+        // --- STAGE TRANSITION SYSTEM ---
+        const mainBtn = document.getElementById('main-btn');
+        const btnText = document.getElementById('btn-text');
+        const stageSubtitle = document.getElementById('stage-subtitle');
+
+        mainBtn.addEventListener('click', () => {
+            if (currentStage === 0) {
+                triggerStageTransition();
+            } else if (currentStage === 1) {
+                openLetterModal();
+            }
+        });
+
+        function triggerStageTransition() {
+            if (currentStage !== 0) return;
+            currentStage = 1;
+
+            // Start Audio if not playing
+            if (!isAudioPlaying) toggleAudio();
+
+            playChimeSound(800);
+
+            // Update UI
+            stageSubtitle.innerText = "Explora nuestro universo romántico en 3D 🌌";
+            btnText.innerText = "Leer Mi Carta Estelar 💌";
+
+            // GSAP Orchestration
+            const tl = gsap.timeline();
+
+            // 1. Camera Zoom into Crystal Heart
+            tl.to(camera.position, {
+                x: 0, y: 0, z: 2,
+                duration: 1.5,
+                ease: "power2.inOut",
+                onUpdate: () => controls.update()
+            });
+
+            // 2. Crystal Heart Burst
+            tl.to(crystalGroup.scale, {
+                x: 0.001, y: 0.001, z: 0.001,
+                duration: 0.8,
+                ease: "back.in(2)",
+                onComplete: () => { crystalGroup.visible = false; }
+            });
+
+            // 3. Camera pulls back to reveal Bouquet & Galaxy
+            tl.to(camera.position, {
+                x: 0, y: 1, z: 9,
+                duration: 2.0,
+                ease: "power3.out",
+                onUpdate: () => controls.update()
+            }, "-=0.2");
+
+            // 4. Bouquet Bloom Animation
+            tl.to(bouquetGroup.scale, {
+                x: 1, y: 1, z: 1,
+                duration: 1.8,
+                ease: "elastic.out(1, 0.5)"
+            }, "-=1.5");
+
+            // 5. Photo Frames Reveal
+            frameMeshes.forEach((frame, idx) => {
+                tl.to(frame.scale, {
+                    x: 1, y: 1, z: 1,
+                    duration: 1.2,
+                    ease: "back.out(1.7)"
+                }, `-=${1.0 - idx * 0.2}`);
+            });
+
+            // 6. Floating Notes Constellation Reveal
+            notesGroup.children.forEach((sprite, idx) => {
+                tl.to(sprite.scale, {
+                    x: 1.5, y: 0.38, z: 1,
+                    duration: 0.8,
+                    ease: "power2.out"
+                }, `-=${0.7 - (idx % 3) * 0.1}`);
+            });
+        }
+
+        // --- TYPEWRITER LETTER MODAL ---
+        const letterModal = document.getElementById('letter-modal');
+        const typewriterElem = document.getElementById('typewriter-text');
+        const closeLetterBtn = document.getElementById('close-letter-btn');
+        const newQuoteBtn = document.getElementById('new-quote-btn');
+        const quoteDisplay = document.getElementById('quote-display');
+
+        function openLetterModal() {
+            letterModal.classList.remove('pointer-events-none');
+            letterModal.classList.remove('opacity-0', 'scale-90');
+            letterModal.classList.add('opacity-100', 'scale-100');
+
+            // Reset and start typewriter
+            typewriterElem.innerHTML = '';
+            typewriterIndex = 0;
+            clearInterval(typewriterInterval);
+
+            typewriterInterval = setInterval(() => {
+                if (typewriterIndex < romanticLetterText.length) {
+                    typewriterElem.innerHTML = romanticLetterText.substring(0, typewriterIndex + 1) + '<span class="cursor-blink"></span>';
+                    if (typewriterIndex % 3 === 0) playSoftPop();
+                    typewriterIndex++;
+                } else {
+                    typewriterElem.innerHTML = romanticLetterText;
+                    clearInterval(typewriterInterval);
+                }
+            }, 45);
+        }
+
+        closeLetterBtn.addEventListener('click', () => {
+            letterModal.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+            letterModal.classList.remove('opacity-100', 'scale-100');
+            clearInterval(typewriterInterval);
+        });
+
+        newQuoteBtn.addEventListener('click', () => {
+            const randomQuote = romanticQuotes[Math.floor(Math.random() * romanticQuotes.length)];
+            gsap.to(quoteDisplay, { opacity: 0, duration: 0.2, onComplete: () => {
+                quoteDisplay.innerText = randomQuote;
+                gsap.to(quoteDisplay, { opacity: 1, duration: 0.3 });
+            }});
+            playChimeSound(700);
+        });
+
+        // --- WEB AUDIO API (ROMANTIC AMBIENT SYNTHESIZER) ---
+        const audioBtn = document.getElementById('audio-toggle-btn');
+
+        function initAudio() {
+            if (audioCtx) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            masterGain.connect(audioCtx.destination);
+            startAmbientMelody();
+        }
+
+        function toggleAudio() {
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            isAudioPlaying = !isAudioPlaying;
+            audioBtn.innerHTML = isAudioPlaying ? '🎶' : '🎵';
+            masterGain.gain.setTargetAtTime(isAudioPlaying ? 0.15 : 0, audioCtx.currentTime, 0.5);
+        }
+
+        audioBtn.addEventListener('click', toggleAudio);
+
+        // Arpeggiated Ambient Music Loop
+        const notesFreq = [261.63, 329.63, 392.00, 493.88, 523.25, 659.25, 783.99]; // C Major 7th Chord Sweep
+        let noteStep = 0;
+
+        function startAmbientMelody() {
+            setInterval(() => {
+                if (!isAudioPlaying || !audioCtx) return;
+                
+                const osc = audioCtx.createOscillator();
+                const noteGain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                const freq = notesFreq[noteStep % notesFreq.length];
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                noteGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                noteGain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.3);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+
+                osc.connect(noteGain);
+                noteGain.connect(masterGain);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2.6);
+
+                noteStep++;
+            }, 600);
+        }
+
+        function playChimeSound(freq) {
+            if (!audioCtx || !isAudioPlaying) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.85);
+        }
+
+        function playSoftPop() {
+            if (!audioCtx || !isAudioPlaying) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400 + Math.random() * 200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        // --- ANIMATION LOOP ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Animate Crystal Heart & Rings
+            if (crystalGroup.visible) {
+                heartMesh.position.y = Math.sin(elapsedTime * 2) * 0.15;
+                ring1.rotation.z = elapsedTime * 0.5;
+                ring2.rotation.z = -elapsedTime * 0.4;
+                heartSparkles.rotation.y = elapsedTime * 0.2;
+            }
+
+            // Animate Shooting Stars
+            shootingStars.forEach(star => {
+                star.position.add(star.velocity);
+                star.life++;
+
+                if (star.life < 15) {
+                    star.material.opacity += 0.06;
+                } else if (star.life > star.maxLife - 15) {
+                    star.material.opacity -= 0.06;
+                }
+
+                if (star.life >= star.maxLife || star.position.y < -15) {
+                    resetShootingStar(star);
+                }
+            });
+
+            // Animate Floating Frames & Notes
+            if (currentStage === 1) {
+                frameMeshes.forEach((frame, idx) => {
+                    frame.position.y += Math.sin(elapsedTime * 1.5 + idx) * 0.003;
+                });
+
+                notesGroup.children.forEach((sprite, idx) => {
+                    sprite.position.y += Math.sin(elapsedTime * 1.2 + idx) * 0.002;
+                });
+
+                bouquetGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.1;
+            }
+
+            starField.rotation.y = elapsedTime * 0.02;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Window Resize Handling
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
